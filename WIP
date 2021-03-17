@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <math.h>
+
+void userInput(double*, double*, double*, double*, double*, double*);
+double getSide(double, double, double, double);
+double getAngle(double, double, double);
+double getOrthocenter(double, double, double, double, double, double);
+void printResults(double, double);
+
+int main()
+{
+    double xcoord1;
+    double xcoord2;
+    double xcoord3;
+    double ycoord1;
+    double ycoord2;
+    double ycoord3;
+    double sideA; //length of side A
+    double sideB; //length of side B
+    double sideC; //length of side C
+    double angleA; //angle of A
+    double angleB; //angle of B
+    double angleC; //angle of C
+    double xOrtho; //x coordinate of orthocenter
+    double yOrtho; //y coordinate of orthocenter
+    
+    userInput(&xcoord1, &ycoord1, &xcoord2, &ycoord2, &xcoord3, &ycoord3);
+    
+    sideA = getSide(xcoord1, ycoord1, xcoord2, ycoord2);
+    sideB = getSide(xcoord2, ycoord2, xcoord3, ycoord3);
+    sideC = getSide(xcoord3, ycoord3, xcoord1, ycoord1);
+    
+    angleA = getAngle(sideB, sideA, sideC);
+    angleB = getAngle(sideC, sideA, sideB);
+    angleC = getAngle(sideA, sideB, sideC);
+    
+    xOrtho = getOrthocenter(xcoord1, angleA, xcoord2, angleB, xcoord3, angleC);
+    yOrtho = getOrthocenter(ycoord1, angleA, ycoord2, angleB, ycoord3, angleC);
+    printResults(xOrtho, yOrtho);
+
+    return 0;
+}
+
+void userInput(double *x1, double *y1, double *x2, double *y2, double *x3, double *y3)
+{
+    printf("Enter point #1 -> "); 
+    scanf("%lf %lf", &*x1, &*y1);
+    printf("Enter point #1 -> "); 
+    scanf("%lf %lf", &*x2, &*y2);
+    printf("Enter point #1 -> "); 
+    scanf("%lf %lf", &*x3, &*y3);
+}
+
+double getSide(double x1, double y1, double x2, double y2)
+{
+    double length; //the length of the line between the two coordinate points
+    length = sqrt(pow((x2 - x1), 2) + (pow((y2 - y1), 2)));
+    return(length);
+}
+
+double getAngle(double side1, double side2, double side3)
+{
+    double angle; //measure of desire angle, in degrees
+    angle = acos((pow(side2,2) + pow(side3,2) - pow(side1,2)) / (2 *  side2 * side3));
+    return(angle);
+}
+
+double getOrthocenter(double coord1, double angleA, double coord2, double angleB, double coord3, double angleC)
+{
+    double coordinate; //coordinate of orthocenter
+    coordinate = (coord1 * tan(angleA) + coord2 * tan(angleB) + coord3 * tan(angleC)) / (tan(angleA) + tan(angleB) + tan(angleC));
+    
+    if(coordinate == 0)
+    {
+        coordinate = fabs(coordinate);
+    }
+    
+    return(coordinate);
+}
+
+void printResults(double xOrthocenter, double yOrthocenter)
+{
+    printf("\nCoordinates of orthocenter: %.2lf, %.2lf\n", xOrthocenter, yOrthocenter);
+}
