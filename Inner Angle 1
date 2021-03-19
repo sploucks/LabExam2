@@ -7,6 +7,7 @@ double getAngle(double, double, double, double);
 double getOrthocenter(double, double, double, double, double, double);
 double getLongestSide(double, double, double, double, double, double, double, double, double, double*, double*, double*, double*);
 //double getInnerTriangle();
+void angleOrder(double*, double*, double*);
 void printResults(double, double, double, double, double);
 
 int main()
@@ -53,6 +54,7 @@ int main()
     innerAngleA = getAngle(shortSide1, longestSide, shortSide2, 1); //might have to play around with this order
     innerAngleB = getAngle(shortSide2, longestSide, shortSide1, 1);
     innerAngleC = getAngle(longestSide, shortSide1, shortSide2, 1);
+    angleOrder(&innerAngleA, &innerAngleB, &innerAngleC);
     
     printResults(xOrtho, yOrtho, innerAngleA, innerAngleB, innerAngleC);
 
@@ -108,7 +110,7 @@ double getLongestSide(double side1, double side2, double side3, double xcoord1, 
 {
     double max; //variable for longst side, max number of the three
     
-    if (side1 >= side2 && side1 >= side3)
+    if (side1 > side2 && side1 > side3)
     {
         max = side1;
         *xLong1 = xcoord1;
@@ -116,7 +118,7 @@ double getLongestSide(double side1, double side2, double side3, double xcoord1, 
         *xLong2 = xcoord2;
         *yLong2 = ycoord2;
     }
-    else if (side2 >= side1 && side2 >= side3)
+    else if (side2 > side1 && side2 > side3)
     {
         max = side2;
         *xLong1 = xcoord2;
@@ -124,7 +126,7 @@ double getLongestSide(double side1, double side2, double side3, double xcoord1, 
         *xLong2 = xcoord3;
         *yLong2 = ycoord3;
     }
-    else if (side3 >= side1 && side3 >= side2)
+    else if (side3 > side1 && side3 > side2)
     {
         max = side3;
         *xLong1 = xcoord1;
@@ -134,6 +136,56 @@ double getLongestSide(double side1, double side2, double side3, double xcoord1, 
     }
     
     return(max);
+}
+
+void angleOrder(double *innerAngleA, double *innerAngleB, double *innerAngleC)
+{
+    double max;
+    double middle;
+    double min;
+    
+    if (*innerAngleA >= *innerAngleB && *innerAngleA >= *innerAngleC)
+    {
+        max = *innerAngleA;
+        if (*innerAngleB >= *innerAngleC)
+        {
+            middle = *innerAngleB;
+            min = *innerAngleC;
+        }
+        else {
+            middle = *innerAngleC;
+            min = *innerAngleB;
+        }
+    }
+    else if (*innerAngleB >= *innerAngleA && *innerAngleB >= *innerAngleC)
+    {
+        max = *innerAngleB;
+        if (*innerAngleA >= *innerAngleC)
+        {
+            middle = *innerAngleA;
+            min = *innerAngleC;
+        }
+        else {
+            middle = *innerAngleC;
+            min = *innerAngleA;
+        }
+    }
+    else {
+        max = *innerAngleC;
+        if (*innerAngleA >= *innerAngleB)
+        {
+            middle = *innerAngleA;
+            min = *innerAngleB;
+        }
+        else {
+            middle = *innerAngleB;
+            min = *innerAngleA;
+        }
+    }
+    
+    *innerAngleC = max;
+    *innerAngleB = middle;
+    *innerAngleA = min;
 }
 
 void printResults(double xOrthocenter, double yOrthocenter, double innerAngleA, double innerAngleB, double innerAngleC)
