@@ -3,7 +3,7 @@
 
 void userInput(double*, double*, double*, double*, double*, double*);
 double getSide(double, double, double, double);
-double getAngle(double, double, double);
+double getAngle(double, double, double, double);
 double getOrthocenter(double, double, double, double, double, double);
 double getLongestSide(double, double, double, double, double, double, double, double, double, double*, double*, double*, double*);
 //double getInnerTriangle();
@@ -41,18 +41,18 @@ int main()
     sideA = getSide(xcoord1, ycoord1, xcoord2, ycoord2);
     sideB = getSide(xcoord2, ycoord2, xcoord3, ycoord3);
     sideC = getSide(xcoord3, ycoord3, xcoord1, ycoord1);
-    angleA = getAngle(sideB, sideA, sideC);
-    angleB = getAngle(sideC, sideA, sideB);
-    angleC = getAngle(sideA, sideB, sideC);
+    angleA = getAngle(sideB, sideA, sideC, 0);
+    angleB = getAngle(sideC, sideA, sideB, 0);
+    angleC = getAngle(sideA, sideB, sideC, 0);
     xOrtho = getOrthocenter(xcoord1, angleA, xcoord2, angleB, xcoord3, angleC);
     yOrtho = getOrthocenter(ycoord1, angleA, ycoord2, angleB, ycoord3, angleC);
     
     longestSide = getLongestSide(sideA, sideB, sideC, xcoord1, ycoord1, xcoord2, ycoord2, xcoord3, ycoord3, &xLong1, &yLong1, &xLong2, &yLong2);
     shortSide1 = getSide(xOrtho, yOrtho, xLong1, yLong1);
     shortSide2 = getSide(xOrtho, yOrtho, xLong2, yLong2);
-    innerAngleA = getAngle(shortSide1, longestSide, shortSide2); //might have to play around with this order
-    innerAngleB = getAngle(shortSide2, longestSide, shortSide1);
-    innerAngleC = getAngle(longestSide, shortSide1, shortSide2);
+    innerAngleA = getAngle(shortSide1, longestSide, shortSide2, 1); //might have to play around with this order
+    innerAngleB = getAngle(shortSide2, longestSide, shortSide1, 1);
+    innerAngleC = getAngle(longestSide, shortSide1, shortSide2, 1);
     
     printResults(xOrtho, yOrtho, innerAngleA, innerAngleB, innerAngleC);
 
@@ -76,10 +76,18 @@ double getSide(double x1, double y1, double x2, double y2)
     return(length);
 }
 
-double getAngle(double side1, double side2, double side3)
+double getAngle(double side1, double side2, double side3, double radDeg)
 {
     double angle; //measure of desire angle, in degrees
-    angle = acos((pow(side2,2) + pow(side3,2) - pow(side1,2)) / (2 *  side2 * side3)) * (18);
+    
+    if (radDeg == 0)
+    {
+        angle = acos((pow(side2,2) + pow(side3,2) - pow(side1,2)) / (2 *  side2 * side3));
+    }
+    else {
+        angle = acos((pow(side2,2) + pow(side3,2) - pow(side1,2)) / (2 *  side2 * side3)) * (180 / M_PI);
+    }
+    
     return(angle);
 }
 
