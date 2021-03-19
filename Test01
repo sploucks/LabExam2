@@ -1,0 +1,263 @@
+#include <stdio.h>
+#include <math.h>
+
+void userInput(double*, double*, double*, double*, double*, double*);
+double getSide(double, double, double, double);
+double getAngle(double, double, double, double);
+double getOrthocenter(double, double, double, double, double, double);
+double getLongestSide(double, double, double, double, double, double, double, double, double, double*, double*, double*, double*);
+void angleOrder(double*, double*, double*);
+int getSideType(double, double, double);
+int getAngleType(double, double, double);
+void printResults(double, double, double, double, double, int, int);
+
+int main()
+{
+    double xcoord1;
+    double xcoord2;
+    double xcoord3;
+    double xLong1;
+    double xLong2;
+    double ycoord1;
+    double ycoord2;
+    double ycoord3;
+    double yLong1;
+    double yLong2;
+    double sideA; //length of side A
+    double sideB; //length of side B
+    double sideC; //length of side C
+    double angleA; //angle of A
+    double angleB; //angle of B
+    double angleC; //angle of C
+    double innerAngleA;
+    double innerAngleB;
+    double innerAngleC;
+    double xOrtho; //x coordinate of orthocenter
+    double yOrtho; //y coordinate of orthocenter
+    double longestSide;
+    double shortSide1;
+    double shortSide2;
+    int sideType;
+    int angleType;
+    
+    userInput(&xcoord1, &ycoord1, &xcoord2, &ycoord2, &xcoord3, &ycoord3);
+    sideA = getSide(xcoord1, ycoord1, xcoord2, ycoord2);
+    sideB = getSide(xcoord2, ycoord2, xcoord3, ycoord3);
+    sideC = getSide(xcoord3, ycoord3, xcoord1, ycoord1);
+    angleA = getAngle(sideB, sideA, sideC, 0);
+    angleB = getAngle(sideC, sideA, sideB, 0);
+    angleC = getAngle(sideA, sideB, sideC, 0);
+    xOrtho = getOrthocenter(xcoord1, angleA, xcoord2, angleB, xcoord3, angleC);
+    yOrtho = getOrthocenter(ycoord1, angleA, ycoord2, angleB, ycoord3, angleC);
+    
+    longestSide = getLongestSide(sideA, sideB, sideC, xcoord1, ycoord1, xcoord2, ycoord2, xcoord3, ycoord3, &xLong1, &yLong1, &xLong2, &yLong2);
+    shortSide1 = getSide(xOrtho, yOrtho, xLong1, yLong1);
+    shortSide2 = getSide(xOrtho, yOrtho, xLong2, yLong2);
+    innerAngleA = getAngle(shortSide1, longestSide, shortSide2, 1); //might have to play around with this order
+    innerAngleB = getAngle(shortSide2, longestSide, shortSide1, 1);
+    innerAngleC = getAngle(longestSide, shortSide1, shortSide2, 1);
+    angleOrder(&innerAngleA, &innerAngleB, &innerAngleC);
+    sideType = getSideType(longestSide, shortSide1, shortSide2);
+    angleType = getAngleType(innerAngleA, innerAngleB, innerAngleC);
+    
+    printResults(xOrtho, yOrtho, innerAngleA, innerAngleB, innerAngleC, sideType, angleType);
+
+    return 0;
+}
+
+void userInput(double *x1, double *y1, double *x2, double *y2, double *x3, double *y3)
+{
+    printf("Enter point #1 -> "); 
+    scanf("%lf %lf", &*x1, &*y1);
+    printf("Enter point #1 -> "); 
+    scanf("%lf %lf", &*x2, &*y2);
+    printf("Enter point #1 -> "); 
+    scanf("%lf %lf", &*x3, &*y3);
+}
+
+double getSide(double x1, double y1, double x2, double y2)
+{
+    double length; //the length of the line between the two coordinate points
+    length = sqrt(pow((x2 - x1), 2) + (pow((y2 - y1), 2)));
+    return(length);
+}
+
+double getAngle(double side1, double side2, double side3, double radDeg)
+{
+    double angle; //measure of desire angle, in degrees
+    
+    if (radDeg == 0)
+    {
+        angle = acos((pow(side2,2) + pow(side3,2) - pow(side1,2)) / (2 *  side2 * side3));
+    }
+    else {
+        angle = acos((pow(side2,2) + pow(side3,2) - pow(side1,2)) / (2 *  side2 * side3)) * (180 / M_PI);
+    }
+    
+    return(angle);
+}
+
+double getOrthocenter(double coord1, double angleA, double coord2, double angleB, double coord3, double angleC)
+{
+    double coordinate; //coordinate of orthocenter
+    coordinate = (coord1 * tan(angleA) + coord2 * tan(angleB) + coord3 * tan(angleC)) / (tan(angleA) + tan(angleB) + tan(angleC));
+    
+    if(coordinate == 0)
+    {
+        coordinate = fabs(coordinate);
+    }
+    
+    return(coordinate);
+}
+
+double getLongestSide(double side1, double side2, double side3, double xcoord1, double ycoord1, double xcoord2, double ycoord2, double xcoord3, double ycoord3, double *xLong1, double *yLong1, double *xLong2, double *yLong2)
+{
+    double max; //variable for longst side, max number of the three
+    
+    if (side1 > side2 && side1 > side3)
+    {
+        max = side1;
+        *xLong1 = xcoord1;
+        *yLong1 = ycoord1;
+        *xLong2 = xcoord2;
+        *yLong2 = ycoord2;
+    }
+    else if (side2 > side1 && side2 > side3)
+    {
+        max = side2;
+        *xLong1 = xcoord2;
+        *yLong1 = ycoord2;
+        *xLong2 = xcoord3;
+        *yLong2 = ycoord3;
+    }
+    else if (side3 > side1 && side3 > side2)
+    {
+        max = side3;
+        *xLong1 = xcoord1;
+        *yLong1 = ycoord1;
+        *xLong2 = xcoord3;
+        *yLong2 = ycoord3;
+    }
+    
+    return(max);
+}
+
+void angleOrder(double *innerAngleA, double *innerAngleB, double *innerAngleC)
+{
+    double max;
+    double middle;
+    double min;
+    
+    if (*innerAngleA >= *innerAngleB && *innerAngleA >= *innerAngleC)
+    {
+        max = *innerAngleA;
+        if (*innerAngleB >= *innerAngleC)
+        {
+            middle = *innerAngleB;
+            min = *innerAngleC;
+        }
+        else {
+            middle = *innerAngleC;
+            min = *innerAngleB;
+        }
+    }
+    else if (*innerAngleB >= *innerAngleA && *innerAngleB >= *innerAngleC)
+    {
+        max = *innerAngleB;
+        if (*innerAngleA >= *innerAngleC)
+        {
+            middle = *innerAngleA;
+            min = *innerAngleC;
+        }
+        else {
+            middle = *innerAngleC;
+            min = *innerAngleA;
+        }
+    }
+    else {
+        max = *innerAngleC;
+        if (*innerAngleA >= *innerAngleB)
+        {
+            middle = *innerAngleA;
+            min = *innerAngleB;
+        }
+        else {
+            middle = *innerAngleB;
+            min = *innerAngleA;
+        }
+    }
+    
+    *innerAngleC = max;
+    *innerAngleB = middle;
+    *innerAngleA = min;
+}
+
+int getSideType(double longestSide, double shortSide1, double shortSide2)
+{
+    int result;
+    if (longestSide == shortSide1 && longestSide == shortSide2)
+    {
+        result = 1; //the inner triangle is an equilateral
+    }
+    else if (longestSide == shortSide1 || longestSide == shortSide2 || shortSide1 == shortSide2)
+    {
+        result = 2; //inner triangle is an isosceles
+    }
+    else {
+        result = 3; //inner triangle is scalene
+    }
+    return(result);
+}
+
+int getAngleType(double innerAngleA, double innerAngleB, double innerAngleC)
+{
+    int result;
+    innerAngleA = round(innerAngleA * 1000) / 1000;
+    innerAngleB = round(innerAngleB * 1000) / 1000;
+    innerAngleC = round(innerAngleC * 1000) / 1000;
+    
+    if ((innerAngleA + 0.001) == 90 || (innerAngleA - 0.001)  == 90 || (innerAngleB + 0.001)  == 90 || (innerAngleB - 0.001)  == 90 || (innerAngleC + 0.001)  == 90 || (innerAngleC - 0.001)  == 90)
+    {
+        result = 1; //triangle is a right triangle
+    }
+    else if ((innerAngleA + 0.001) < 90 || (innerAngleA - 0.001)  < 90 || (innerAngleB + 0.001)  < 90 || (innerAngleB - 0.001)  < 90 || (innerAngleC + 0.001)  < 90 || (innerAngleC - 0.001)  < 90)
+    {
+        result = 2; //this is an acute triangle
+    }
+    else {
+        result = 3; //obtuse triangle
+    }
+    
+    return(result);
+}
+
+void printResults(double xOrthocenter, double yOrthocenter, double innerAngleA, double innerAngleB, double innerAngleC, int sideType, int angleType)
+{
+    printf("\nCoordinates of orthocenter: %.2lf, %.2lf\n", xOrthocenter, yOrthocenter);
+    printf("Internal triangle angles: %.1lf, %.1lf, %.1lf\n", innerAngleA, innerAngleB, innerAngleC);
+    printf("Triangle Type: ");
+    
+    switch(sideType) {
+        case 1:
+            printf("Equilateral ");
+            break;
+        case 2:
+            printf("Isosceles ");
+            break;
+        case 3:
+            printf("Scalene ");
+            break;
+    }
+    
+    switch(angleType) {
+        case 1:
+            printf("right");
+            break;
+        case 2:
+            printf("acute");
+            break;
+        case 3:
+            printf("obtuse");
+            break;
+    }
+}
